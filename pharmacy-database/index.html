@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v12M6 12h12"></path>
+            </svg>
+            <span>PharmaCare</span>
+        </div>
+        <div class="nav-user">
+            <span id="userDisplay">Guest</span>
+            <button id="logoutBtn" class="btn-logout" onclick="logout()" style="display:none;">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ==================== FORM 2: LOGIN ==================== -->
+        <div id="loginForm" class="form-container active">
+            <div class="form-wrapper login-wrapper">
+                <div class="form-header" style="border-bottom: none; justify-content: center;">
+                    <div>
+                        <h1>🏥 PharmaCare</h1>
+                        <p>Pharmacy Management System</p>
+                    </div>
+                </div>
+                <form onsubmit="handleLogin(event)" class="form">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+                <p class="demo-info">Login: admin1/adminpass or pharma1/pharmapass</p>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 1: DASHBOARD ==================== -->
+        <div id="dashboard" class="form-container">
+            <div class="dashboard-wrapper">
+                <div class="dashboard-header">
+                    <h1>Dashboard</h1>
+                    <p id="roleDisplay">Welcome!</p>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="stats-container">
+                    <div class="stat-card stat-products">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h3 id="statProducts">0</h3>
+                            <p>Total Products</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-users">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3 id="statUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-suppliers">
+                        <div class="stat-icon">🚚</div>
+                        <div class="stat-info">
+                            <h3 id="statSuppliers">0</h3>
+                            <p>Total Suppliers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-lowstock">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <h3 id="statLowStock">0</h3>
+                            <p>Low Stock Items</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-sales">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3 id="statSales">Rs. 0</h3>
+                            <p>Total Sales</p>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-inventory">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <h3 id="statInventory">Rs. 0</h3>
+                            <p>Inventory Value</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>📈 Top Selling Products</h3>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>📊 Stock Distribution</h3>
+                        <canvas id="stockDistChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="dashboard-grid">
+                    <!-- Admin Only Buttons -->
+                    <button class="dashboard-btn" id="btnInsertProduct" onclick="showForm('insertProduct')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"></path>
+                        </svg>
+                        <span>Insert Product</span>
+                    </button>
+                    <button class="dashboard-btn" id="btnUpdateProduct" onclick="showForm('updateProduct')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span>Update Product</span>
+                    </button>
+                    <button class="dashboard-btn" id="btnDeleteProduct" onclick="showForm('deleteProduct')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span>Delete Product</span>
+                    </button>
+                    
+                    <!-- Both Roles -->
+                    <button class="dashboard-btn" id="btnSearchProducts" onclick="showForm('searchProducts')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <span>Search Products</span>
+                    </button>
+                    
+                    <!-- Pharmacist: Sell, Admin: No -->
+                    <button class="dashboard-btn" id="btnSellProducts" onclick="showForm('sellForm')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span>Sell Products</span>
+                    </button>
+                    
+                    <!-- Admin Only -->
+                    <button class="dashboard-btn" id="btnManageUsers" onclick="showForm('manageUsers')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Manage Users</span>
+                    </button>
+                    <button class="dashboard-btn" id="btnManageSuppliers" onclick="showForm('manageSuppliers')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="3" width="15" height="13"></rect>
+                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                        </svg>
+                        <span>Manage Suppliers</span>
+                    </button>
+                    
+                    <!-- Reports - Different for each role -->
+                    <button class="dashboard-btn" id="btnFullReports" onclick="showForm('reports')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <span>Full Reports</span>
+                    </button>
+                    <button class="dashboard-btn" id="btnLimitedReports" onclick="showForm('reports')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <span>Limited Reports</span>
+                    </button>
+                    
+                    <!-- Admin Only -->
+                    <button class="dashboard-btn" id="btnBackupDatabase" onclick="showForm('backup')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Backup Database</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 1: INSERT PRODUCT ==================== -->
+        <div id="insertProduct" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Insert New Product</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <form onsubmit="handleInsertProduct(event)" class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prodID">Product ID</label>
+                            <input type="text" id="prodID" placeholder="Enter product ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodName">Product Name</label>
+                            <input type="text" id="prodName" placeholder="Enter product name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="salePrice">Sale Price</label>
+                            <input type="number" id="salePrice" placeholder="0.00" step="0.01" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Insert Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 1: UPDATE PRODUCT ==================== -->
+        <div id="updateProduct" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Update Product</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <form onsubmit="handleUpdateProduct(event)" class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="updateProdID">Product ID</label>
+                            <input type="text" id="updateProdID" placeholder="Enter product ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateProdName">New Product Name</label>
+                            <input type="text" id="updateProdName" placeholder="Enter new name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateSalePrice">New Sale Price</label>
+                            <input type="number" id="updateSalePrice" placeholder="0.00" step="0.01" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Update Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 1: DELETE PRODUCT ==================== -->
+        <div id="deleteProduct" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Delete Product</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <form onsubmit="handleDeleteProduct(event)" class="form">
+                    <div class="form-group">
+                        <label for="deleteProdID">Product ID</label>
+                        <input type="text" id="deleteProdID" placeholder="Enter product ID to delete" required>
+                    </div>
+                    <button type="submit" class="btn-danger">Delete Product</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 1: SEARCH PRODUCTS ==================== -->
+        <div id="searchProducts" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Search Products</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <form onsubmit="handleSearchProducts(event)" class="form">
+                    <div class="form-group">
+                        <label for="searchProdName">Product Name</label>
+                        <input type="text" id="searchProdName" placeholder="Enter product name to search" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Search</button>
+                </form>
+                <div id="searchResults" class="data-grid" style="display:none;">
+                    <h3>Search Results</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Product ID</th><th>Product Name</th><th>Sale Price</th></tr>
+                        </thead>
+                        <tbody id="searchResultsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 3: SELL PRODUCTS ==================== -->
+        <div id="sellForm" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Sell Products</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <div class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saleID">Sale ID</label>
+                            <input type="text" id="saleID" placeholder="Enter sale ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="selectProduct">Select Product</label>
+                            <select id="selectProduct" required>
+                                <option value="">-- Select a product --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantityInput">Quantity</label>
+                            <input type="number" id="quantityInput" placeholder="Enter quantity" min="1" required>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addToCart()" class="btn-secondary">+ Add to Cart</button>
+                </div>
+                
+                <div class="invoice-container">
+                    <h3>📋 Invoice</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Product</th><th>Quantity</th><th>Sale ID</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="invoiceBody"></tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="generateInvoice()" class="btn-success">Generate Invoice</button>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 4: MANAGE SUPPLIERS ==================== -->
+        <div id="manageSuppliers" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Manage Suppliers</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <div class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="suppID">Supplier ID</label>
+                            <input type="text" id="suppID" placeholder="Enter supplier ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="suppName">Supplier Name</label>
+                            <input type="text" id="suppName" placeholder="Enter supplier name">
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="addSupplier()" class="btn-primary">Add Supplier</button>
+                        <button type="button" onclick="deleteSupplier()" class="btn-danger">Delete Supplier</button>
+                    </div>
+                    <div class="search-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="searchSupplierInput">🔍 Search Supplier (ID or Name)</label>
+                                <input type="text" id="searchSupplierInput" placeholder="Enter ID or name to search...">
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" onclick="searchSupplier()" class="btn-secondary">🔍 Search</button>
+                            <button type="button" onclick="clearSupplierSearch()" class="btn-outline">Clear Search</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="suppliersTable" class="data-grid">
+                    <h3>Suppliers List</h3>
+                    <table>
+                        <thead><tr><th>Supplier ID</th><th>Supplier Name</th></tr></thead>
+                        <tbody id="suppliersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 5: MANAGE USERS ==================== -->
+        <div id="manageUsers" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Manage Users</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <div class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUsername">Username</label>
+                            <input type="text" id="newUsername" placeholder="Enter username">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserRole">Role</label>
+                            <select id="newUserRole">
+                                <option value="">-- Select Role --</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Pharmacist">Pharmacist</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="addUser()" class="btn-primary">Add User</button>
+                        <button type="button" onclick="deleteUser()" class="btn-danger">Delete User</button>
+                        <button type="button" onclick="searchUser()" class="btn-secondary">Search</button>
+                    </div>
+                </div>
+                <div id="usersTable" class="data-grid">
+                    <h3>Users List</h3>
+                    <table>
+                        <thead><tr><th>Username</th><th>Role</th></tr></thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 6: REPORTS ==================== -->
+        <div id="reports" class="form-container">
+            <div class="form-wrapper" style="max-width: 1000px;">
+                <div class="form-header">
+                    <h2>📊 Reports</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                <div class="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reportType">Report Type</label>
+                            <select id="reportType">
+                                <option value="">-- Select Report --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" onclick="loadReport()" class="btn-primary">Generate Report</button>
+                        <button type="button" onclick="exportReportCSV()" class="btn-secondary" id="btnExportCSV" style="display:none;">📥 Export CSV</button>
+                        <button type="button" onclick="printReport()" class="btn-secondary" id="btnPrint" style="display:none;">🖨️ Print</button>
+                    </div>
+                </div>
+                <div id="reportContainer" class="data-grid report-grid" style="display:none;">
+                    <div class="report-header-info">
+                        <h3 id="reportTitle">Report</h3>
+                        <p id="reportDate"></p>
+                        <p id="reportSummary"></p>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="reportTable">
+                            <thead id="reportHead"></thead>
+                            <tbody id="reportBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== FORM 7: BACKUP/RESTORE ==================== -->
+        <div id="backup" class="form-container">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h2>Backup & Restore Database</h2>
+                    <button class="btn-back" onclick="showForm('dashboard')">← Back</button>
+                </div>
+                
+                <div class="backup-section">
+                    <h3>💾 Backup Database</h3>
+                    <div class="form">
+                        <div class="form-group">
+                            <label for="backupPath">Backup File Path</label>
+                            <input type="text" id="backupPath" placeholder="C:\Backup\pharmacy_backup.bak">
+                        </div>
+                        <button type="button" onclick="backupDatabase()" class="btn-primary">Create Backup</button>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="backup-section">
+                    <h3>🔄 Restore Database</h3>
+                    <div class="form">
+                        <div class="form-group">
+                            <label for="restorePath">Backup File Path</label>
+                            <input type="text" id="restorePath" placeholder="C:\Backup\pharmacy_backup.bak">
+                        </div>
+                        <button type="button" onclick="restoreDatabase()" class="btn-warning">Restore Database</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
